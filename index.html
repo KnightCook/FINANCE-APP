@@ -2,218 +2,406 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cash Flow Manager</title>
-  <!-- Web App Manifest settings for Android Home Screen -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cash Flow Tracker</title>
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --accent: #3b82f6;
-      --text: #f8fafc;
-      --green: #22c55e;
-      --border: #334155;
+      --bg-color: #0b0f19;
+      --card-bg: #1e293b;
+      --card-inner: #0f172a;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      
+      /* Colors */
+      --green-income: #22c55e;
+      --green-glow: rgba(34, 197, 94, 0.15);
+      --orange-bill: #f97316;
+      --orange-glow: rgba(249, 115, 22, 0.15);
+      --danger-red: #ef4444;
+      
+      /* New Baby Blue for Credit */
+      --blue-credit: #38bdf8;
+      --blue-glow: rgba(56, 189, 248, 0.15);
+      
+      --border-color: #334155;
     }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
+
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
       padding: 1rem;
+      display: flex;
+      justify-content: center;
     }
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      padding-bottom: 2rem;
     }
+
+    /* Cards */
     .card {
-      background: var(--card);
-      padding: 1.25rem;
-      border-radius: 12px;
-      margin-bottom: 1rem;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
+      background-color: var(--card-bg);
+      border-radius: 28px;
+      padding: 1.5rem;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
     }
-    h2 { margin: 0 0 1rem 0; font-size: 1.2rem; }
-    .metric {
+
+    h1 { font-size: 1.4rem; font-weight: 700; text-align: center; margin-bottom: 1.25rem; }
+    h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-main); }
+
+    /* Inputs */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+    label { font-size: 0.85rem; color: var(--text-sub); margin-left: 0.5rem; }
+    input, select {
+      background-color: var(--card-inner);
+      border: 1.5px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.85rem 1.25rem;
+      border-radius: 9999px;
+      font-size: 1rem;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s ease;
+    }
+    input:focus, select:focus { border-color: var(--green-income); }
+    .credit-input:focus { border-color: var(--blue-credit) !important; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      padding: 0.9rem 1.5rem;
+      border-radius: 9999px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      transition: transform 0.1s ease;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-orange { background-color: var(--orange-bill); color: #3b1402; box-shadow: 0 4px 14px var(--orange-glow); }
+    .btn-blue { background-color: var(--blue-credit); color: #082f49; box-shadow: 0 4px 14px var(--blue-glow); }
+    
+    .btn-delete {
+      background-color: transparent;
+      color: var(--danger-red);
+      border: 1px solid var(--danger-red);
+      border-radius: 9999px;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      margin-top: 0.4rem;
+    }
+
+    /* Text Colors */
+    .income-text { color: var(--green-income); font-weight: 700; font-size: 1.1rem; }
+    .bill-text { color: var(--orange-bill); font-weight: 700; font-size: 1.1rem; }
+    .credit-text { color: var(--blue-credit); font-weight: 700; font-size: 1.1rem; }
+
+    /* Stat Rows */
+    .stat-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin: 0.75rem 0;
-      font-size: 1rem;
-    }
-    .surplus { font-size: 1.25rem; font-weight: bold; color: var(--green); }
-    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
-    
-    /* Inputs & Buttons */
-    input[type="number"], input[type="text"] {
-      background: var(--bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 0.5rem;
-      border-radius: 6px;
-      width: 100px;
-      font-size: 1rem;
-    }
-    input[type="text"] { width: 100%; box-sizing: border-box; margin-bottom: 0.5rem; }
-    button {
-      background: var(--accent);
-      color: white;
-      border: none;
       padding: 0.75rem 1rem;
-      border-radius: 6px;
-      width: 100%;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 0.5rem;
+      border-radius: 18px;
+      background-color: var(--card-inner);
+      margin-bottom: 0.6rem;
     }
+
+    .leftover-box {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(15, 23, 42, 0.8));
+      border: 1.5px solid var(--green-income);
+      border-radius: 22px;
+      padding: 1.2rem;
+      text-align: center;
+      margin-top: 1rem;
+    }
+    .leftover-box span { font-size: 0.9rem; color: var(--text-sub); }
+    .leftover-box .amount { font-size: 1.7rem; font-weight: 800; margin-top: 0.25rem; }
+
+    /* Lists */
+    .list-container { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
     
-    /* Sliders */
-    .bill-row { margin-bottom: 1.25rem; }
-    .bill-meta {
+    .item-card {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 0.5rem;
+      align-items: center;
+      background-color: var(--card-inner);
+      border-radius: 16px;
+      padding: 0.9rem 1.1rem;
     }
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-    }
+    .item-card.bill { border-left: 5px solid var(--orange-bill); }
+    .item-card.credit { border-left: 5px solid var(--blue-credit); }
     
-    .add-bill-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 0.5rem;
-    }
+    .item-info { display: flex; flex-direction: column; gap: 0.2rem; }
+    .item-title { font-weight: 600; font-size: 1rem; color: var(--text-main); }
+    .item-sub { font-size: 0.8rem; color: var(--text-sub); }
+    .item-actions { display: flex; flex-direction: column; align-items: flex-end; }
   </style>
 </head>
 <body>
-  <div class="container">
-    
-    <!-- Income & Summary Card -->
+
+  <div class="app-container">
+
+    <!-- Monthly Cash Flow -->
     <div class="card">
-      <h2>Monthly Summary</h2>
-      <div class="metric">
-        <span>Monthly Income:</span>
-        <div>$<input type="number" id="incomeInput" value="4000" step="100"></div>
+      <h1>Monthly Cash Flow</h1>
+
+      <div class="input-group">
+        <label>Total Monthly Income ($)</label>
+        <input type="number" id="monthlyIncomeInput" step="50">
       </div>
-      <div class="metric">
-        <span>Total Bills:</span>
-        <span id="totalBills">$0.00</span>
+
+      <div class="stat-row">
+        <span>Incoming Cash</span>
+        <span class="income-text" id="displayIncome">$0.00</span>
       </div>
-      <hr>
-      <div class="metric">
-        <span>Monthly Free Cash:</span>
-        <span class="surplus" id="monthlySurplus">$0.00</span>
+      <div class="stat-row">
+        <span>Fixed Bills</span>
+        <span class="bill-text" id="displayBills">$0.00</span>
       </div>
-      <div class="metric">
-        <span>Yearly Free Cash:</span>
-        <span class="surplus" id="yearlySurplus">$0.00</span>
+      <div class="stat-row">
+        <span>Credit Payments</span>
+        <span class="credit-text" id="displayCreditPayments">$0.00</span>
+      </div>
+
+      <div class="leftover-box">
+        <span>Monthly Free Cash</span>
+        <div class="amount" id="displayMonthlyLeftover">$0.00</div>
       </div>
     </div>
 
-    <!-- Dynamic Sliders Container -->
-    <div class="card" id="slidersContainer">
-      <!-- Sliders injected here via JS -->
+    <!-- Debt & Annual Outlook -->
+    <div class="card">
+      <h2>Debt & Annual Outlook</h2>
+      <div class="stat-row">
+        <span>Total Credit Debt</span>
+        <span class="credit-text" id="displayTotalDebt">$0.00</span>
+      </div>
+      <div class="stat-row">
+        <span>Yearly Free Cash</span>
+        <span class="income-text" id="displayYearlyLeftover">$0.00</span>
+      </div>
     </div>
 
-    <!-- Add New Bill Card -->
-    <div class="card">
-      <h2>Add a Bill</h2>
-      <div class="add-bill-grid">
-        <input type="text" id="newBillName" placeholder="e.g. Gym Membership">
-        <input type="number" id="newBillAmount" placeholder="Amount" step="1">
+    <!-- Add Credit Card Form -->
+    <div class="card" style="border-color: var(--blue-glow);">
+      <h2 style="color: var(--blue-credit);">Add Credit Card</h2>
+      
+      <div class="input-group">
+        <label>Card Name (e.g. Best Buy)</label>
+        <input type="text" id="creditNameInput" class="credit-input">
       </div>
-      <button onclick="addBill()">+ Add Bill</button>
+      <div class="input-group">
+        <label>Total Current Balance ($)</label>
+        <input type="number" id="creditBalanceInput" class="credit-input" step="0.01">
+      </div>
+      <div class="input-group">
+        <label>Monthly Payment ($)</label>
+        <input type="number" id="creditPaymentInput" class="credit-input" step="0.01">
+      </div>
+      <div class="input-group">
+        <label>Payment Due Date</label>
+        <select id="creditDaySelect" class="credit-input"></select>
+      </div>
+
+      <button class="btn btn-blue" onclick="addCredit()">+ Add Credit Card</button>
+    </div>
+
+    <!-- Active Credit Cards List -->
+    <div class="card">
+      <h2 style="color: var(--blue-credit);">Active Credit Cards</h2>
+      <div class="list-container" id="creditListContainer"></div>
+    </div>
+
+    <!-- Add Bill Form -->
+    <div class="card" style="border-color: var(--orange-glow);">
+      <h2 style="color: var(--orange-bill);">Add Recurring Bill</h2>
+      
+      <div class="input-group">
+        <label>Bill Name</label>
+        <input type="text" id="billNameInput">
+      </div>
+      <div class="input-group">
+        <label>Amount ($)</label>
+        <input type="number" id="billAmountInput" step="0.01">
+      </div>
+      <div class="input-group">
+        <label>Recurring Day</label>
+        <select id="billDaySelect"></select>
+      </div>
+
+      <button class="btn btn-orange" onclick="addBill()">+ Add Recurring Bill</button>
+    </div>
+
+    <!-- Active Bills List -->
+    <div class="card">
+      <h2 style="color: var(--orange-bill);">Active Bills</h2>
+      <div class="list-container" id="billsListContainer"></div>
     </div>
 
   </div>
 
   <script>
-    // Initial generic bills array
-    let bills = [
-      { id: "rent", label: "Rent", value: 1295, max: 2000, step: 10 },
-      { id: "car_payment", label: "Car Payment", value: 298, max: 600, step: 5 },
-      { id: "electricity", label: "Electricity", value: 110, max: 300, step: 5 },
-      { id: "internet", label: "Internet", value: 110, max: 250, step: 1 },
-      { id: "cell_phone", label: "Cell Phone", value: 178, max: 300, step: 1 },
-      { id: "car_insurance", label: "Car Insurance", value: 167, max: 300, step: 1 }
-    ];
-
-    const container = document.getElementById("slidersContainer");
-    const incomeInput = document.getElementById("incomeInput");
-
-    // Recalculate whenever income changes
-    incomeInput.addEventListener("input", recalculate);
-
-    function renderBills() {
-      container.innerHTML = "<h2>Adjust Bills</h2>";
+    // Populate Dropdowns
+    const billDaySelect = document.getElementById("billDaySelect");
+    const creditDaySelect = document.getElementById("creditDaySelect");
+    for (let day = 1; day <= 31; day++) {
+      const suffix = (day === 1 || day === 21 || day === 31) ? "st" :
+                     (day === 2 || day === 22) ? "nd" :
+                     (day === 3 || day === 23) ? "rd" : "th";
+      const optionText = `${day}${suffix} of every month`;
       
-      bills.forEach((bill, index) => {
-        const row = document.createElement("div");
-        row.className = "bill-row";
-        
-        // Dynamically scale slider max if the bill exceeds the default max
-        const currentMax = Math.max(bill.max, bill.value * 2);
-
-        row.innerHTML = `
-          <div class="bill-meta">
-            <span>${bill.label}</span>
-            <span id="val-${index}">$${bill.value.toFixed(2)}</span>
-          </div>
-          <input type="range" id="input-${index}" min="0" max="${currentMax}" step="${bill.step}" value="${bill.value}">
-        `;
-        container.appendChild(row);
-
-        // Listen for slider adjustments
-        const input = row.querySelector(`#input-${index}`);
-        input.addEventListener("input", (e) => {
-          bills[index].value = parseFloat(e.target.value);
-          document.getElementById(`val-${index}`).innerText = `$${bills[index].value.toFixed(2)}`;
-          recalculate();
-        });
-      });
-      recalculate();
+      const opt1 = document.createElement("option"); opt1.value = day; opt1.textContent = optionText;
+      const opt2 = document.createElement("option"); opt2.value = day; opt2.textContent = optionText;
+      
+      billDaySelect.appendChild(opt1);
+      creditDaySelect.appendChild(opt2);
     }
 
-    function recalculate() {
-      const income = parseFloat(incomeInput.value) || 0;
-      const total = bills.reduce((sum, b) => sum + b.value, 0);
-      const monthlyFree = income - total;
-      const yearlyFree = monthlyFree * 12;
+    // Load Data
+    let bills = JSON.parse(localStorage.getItem("user_bills")) || [];
+    let creditCards = JSON.parse(localStorage.getItem("user_credit")) || [];
+    let storedIncome = localStorage.getItem("user_income") || "4000";
 
-      document.getElementById("totalBills").innerText = `$${total.toFixed(2)}`;
-      document.getElementById("monthlySurplus").innerText = `$${monthlyFree.toFixed(2)}`;
-      document.getElementById("yearlySurplus").innerText = `$${yearlyFree.toFixed(2)}`;
+    const incomeInput = document.getElementById("monthlyIncomeInput");
+    incomeInput.value = storedIncome;
+
+    incomeInput.addEventListener("input", () => {
+      localStorage.setItem("user_income", incomeInput.value);
+      updateCalculations();
+    });
+
+    function saveAndRender() {
+      localStorage.setItem("user_bills", JSON.stringify(bills));
+      localStorage.setItem("user_credit", JSON.stringify(creditCards));
+      renderLists();
+      updateCalculations();
     }
 
+    // Add Functions
     function addBill() {
-      const nameInput = document.getElementById("newBillName");
-      const amountInput = document.getElementById("newBillAmount");
-      const name = nameInput.value.trim();
-      const amount = parseFloat(amountInput.value);
+      const name = document.getElementById("billNameInput").value.trim();
+      const amount = parseFloat(document.getElementById("billAmountInput").value);
+      const day = parseInt(document.getElementById("billDaySelect").value, 10);
 
-      if (name !== "" && !isNaN(amount)) {
-        // Create new bill object
-        bills.push({
-          id: name.toLowerCase().replace(/\\s+/g, '_'),
-          label: name,
-          value: amount,
-          max: amount > 0 ? amount * 2 : 100, // Set sensible slider maximum
-          step: 1
-        });
-        
-        // Clear inputs and re-render UI
-        nameInput.value = "";
-        amountInput.value = "";
-        renderBills();
+      if (name && amount > 0) {
+        bills.push({ id: Date.now().toString(), name, amount, day });
+        document.getElementById("billNameInput").value = "";
+        document.getElementById("billAmountInput").value = "";
+        saveAndRender();
       }
     }
 
-    // Initial render on page load
-    renderBills();
+    function addCredit() {
+      const name = document.getElementById("creditNameInput").value.trim();
+      const balance = parseFloat(document.getElementById("creditBalanceInput").value);
+      const payment = parseFloat(document.getElementById("creditPaymentInput").value);
+      const day = parseInt(document.getElementById("creditDaySelect").value, 10);
+
+      if (name && balance >= 0 && payment >= 0) {
+        creditCards.push({ id: Date.now().toString(), name, balance, payment, day });
+        document.getElementById("creditNameInput").value = "";
+        document.getElementById("creditBalanceInput").value = "";
+        document.getElementById("creditPaymentInput").value = "";
+        saveAndRender();
+      }
+    }
+
+    // Delete Functions
+    function deleteBill(id) { bills = bills.filter(b => b.id !== id); saveAndRender(); }
+    function deleteCredit(id) { creditCards = creditCards.filter(c => c.id !== id); saveAndRender(); }
+
+    // Render Lists
+    function renderLists() {
+      const bContainer = document.getElementById("billsListContainer");
+      const cContainer = document.getElementById("creditListContainer");
+      bContainer.innerHTML = "";
+      cContainer.innerHTML = "";
+
+      const sortedBills = [...bills].sort((a, b) => a.day - b.day);
+      sortedBills.forEach(bill => {
+        bContainer.innerHTML += `
+          <div class="item-card bill">
+            <div class="item-info">
+              <span class="item-title">${bill.name}</span>
+              <span class="item-sub">Due on the ${bill.day}</span>
+            </div>
+            <div class="item-actions">
+              <span class="bill-text">$${bill.amount.toFixed(2)}</span>
+              <button class="btn-delete" onclick="deleteBill('${bill.id}')">Delete</button>
+            </div>
+          </div>`;
+      });
+
+      const sortedCredit = [...creditCards].sort((a, b) => a.day - b.day);
+      sortedCredit.forEach(card => {
+        cContainer.innerHTML += `
+          <div class="item-card credit">
+            <div class="item-info">
+              <span class="item-title">${card.name}</span>
+              <span class="item-sub">Balance: $${card.balance.toFixed(2)}</span>
+              <span class="item-sub">Due on the ${card.day}</span>
+            </div>
+            <div class="item-actions">
+              <span class="credit-text">-$${card.payment.toFixed(2)}/mo</span>
+              <button class="btn-delete" onclick="deleteCredit('${card.id}')">Delete</button>
+            </div>
+          </div>`;
+      });
+    }
+
+    // Calculations
+    function updateCalculations() {
+      const income = parseFloat(incomeInput.value) || 0;
+      const totalBills = bills.reduce((sum, item) => sum + item.amount, 0);
+      const totalCreditPayments = creditCards.reduce((sum, item) => sum + item.payment, 0);
+      const totalDebt = creditCards.reduce((sum, item) => sum + item.balance, 0);
+      
+      const leftover = income - (totalBills + totalCreditPayments);
+      const yearlyLeftover = leftover * 12;
+
+      document.getElementById("displayIncome").textContent = `$${income.toFixed(2)}`;
+      document.getElementById("displayBills").textContent = `$${totalBills.toFixed(2)}`;
+      document.getElementById("displayCreditPayments").textContent = `$${totalCreditPayments.toFixed(2)}`;
+      document.getElementById("displayTotalDebt").textContent = `$${totalDebt.toFixed(2)}`;
+      
+      const leftoverEl = document.getElementById("displayMonthlyLeftover");
+      leftoverEl.textContent = `$${leftover.toFixed(2)}`;
+      leftoverEl.style.color = leftover >= 0 ? "var(--green-income)" : "var(--danger-red)";
+      leftoverEl.parentElement.style.borderColor = leftover >= 0 ? "var(--green-income)" : "var(--danger-red)";
+
+      document.getElementById("displayYearlyLeftover").textContent = `$${yearlyLeftover.toFixed(2)}`;
+      document.getElementById("displayYearlyLeftover").style.color = yearlyLeftover >= 0 ? "var(--green-income)" : "var(--danger-red)";
+    }
+
+    // Initial Load
+    renderLists();
+    updateCalculations();
   </script>
 </body>
 </html>
