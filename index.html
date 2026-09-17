@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cash Flow Manager</title>
+  <!-- Web App Manifest settings for Android Home Screen -->
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #3b82f6;
+      --text: #f8fafc;
+      --green: #22c55e;
+      --border: #334155;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 1rem;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .card {
+      background: var(--card);
+      padding: 1.25rem;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
+    }
+    h2 { margin: 0 0 1rem 0; font-size: 1.2rem; }
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0.75rem 0;
+      font-size: 1rem;
+    }
+    .surplus { font-size: 1.25rem; font-weight: bold; color: var(--green); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    
+    /* Inputs & Buttons */
+    input[type="number"], input[type="text"] {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.5rem;
+      border-radius: 6px;
+      width: 100px;
+      font-size: 1rem;
+    }
+    input[type="text"] { width: 100%; box-sizing: border-box; margin-bottom: 0.5rem; }
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      width: 100%;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    
+    /* Sliders */
+    .bill-row { margin-bottom: 1.25rem; }
+    .bill-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+    
+    .add-bill-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Income & Summary Card -->
+    <div class="card">
+      <h2>Monthly Summary</h2>
+      <div class="metric">
+        <span>Monthly Income:</span>
+        <div>$<input type="number" id="incomeInput" value="4000" step="100"></div>
+      </div>
+      <div class="metric">
+        <span>Total Bills:</span>
+        <span id="totalBills">$0.00</span>
+      </div>
+      <hr>
+      <div class="metric">
+        <span>Monthly Free Cash:</span>
+        <span class="surplus" id="monthlySurplus">$0.00</span>
+      </div>
+      <div class="metric">
+        <span>Yearly Free Cash:</span>
+        <span class="surplus" id="yearlySurplus">$0.00</span>
+      </div>
+    </div>
+
+    <!-- Dynamic Sliders Container -->
+    <div class="card" id="slidersContainer">
+      <!-- Sliders injected here via JS -->
+    </div>
+
+    <!-- Add New Bill Card -->
+    <div class="card">
+      <h2>Add a Bill</h2>
+      <div class="add-bill-grid">
+        <input type="text" id="newBillName" placeholder="e.g. Gym Membership">
+        <input type="number" id="newBillAmount" placeholder="Amount" step="1">
+      </div>
+      <button onclick="addBill()">+ Add Bill</button>
+    </div>
+
+  </div>
+
+  <script>
+    // Initial generic bills array
+    let bills = [
+      { id: "rent", label: "Rent", value: 1295, max: 2000, step: 10 },
+      { id: "car_payment", label: "Car Payment", value: 298, max: 600, step: 5 },
+      { id: "electricity", label: "Electricity", value: 110, max: 300, step: 5 },
+      { id: "internet", label: "Internet", value: 110, max: 250, step: 1 },
+      { id: "cell_phone", label: "Cell Phone", value: 178, max: 300, step: 1 },
+      { id: "car_insurance", label: "Car Insurance", value: 167, max: 300, step: 1 }
+    ];
+
+    const container = document.getElementById("slidersContainer");
+    const incomeInput = document.getElementById("incomeInput");
+
+    // Recalculate whenever income changes
+    incomeInput.addEventListener("input", recalculate);
+
+    function renderBills() {
+      container.innerHTML = "<h2>Adjust Bills</h2>";
+      
+      bills.forEach((bill, index) => {
+        const row = document.createElement("div");
+        row.className = "bill-row";
+        
+        // Dynamically scale slider max if the bill exceeds the default max
+        const currentMax = Math.max(bill.max, bill.value * 2);
+
+        row.innerHTML = `
+          <div class="bill-meta">
+            <span>${bill.label}</span>
+            <span id="val-${index}">$${bill.value.toFixed(2)}</span>
+          </div>
+          <input type="range" id="input-${index}" min="0" max="${currentMax}" step="${bill.step}" value="${bill.value}">
+        `;
+        container.appendChild(row);
+
+        // Listen for slider adjustments
+        const input = row.querySelector(`#input-${index}`);
+        input.addEventListener("input", (e) => {
+          bills[index].value = parseFloat(e.target.value);
+          document.getElementById(`val-${index}`).innerText = `$${bills[index].value.toFixed(2)}`;
+          recalculate();
+        });
+      });
+      recalculate();
+    }
+
+    function recalculate() {
+      const income = parseFloat(incomeInput.value) || 0;
+      const total = bills.reduce((sum, b) => sum + b.value, 0);
+      const monthlyFree = income - total;
+      const yearlyFree = monthlyFree * 12;
+
+      document.getElementById("totalBills").innerText = `$${total.toFixed(2)}`;
+      document.getElementById("monthlySurplus").innerText = `$${monthlyFree.toFixed(2)}`;
+      document.getElementById("yearlySurplus").innerText = `$${yearlyFree.toFixed(2)}`;
+    }
+
+    function addBill() {
+      const nameInput = document.getElementById("newBillName");
+      const amountInput = document.getElementById("newBillAmount");
+      const name = nameInput.value.trim();
+      const amount = parseFloat(amountInput.value);
+
+      if (name !== "" && !isNaN(amount)) {
+        // Create new bill object
+        bills.push({
+          id: name.toLowerCase().replace(/\\s+/g, '_'),
+          label: name,
+          value: amount,
+          max: amount > 0 ? amount * 2 : 100, // Set sensible slider maximum
+          step: 1
+        });
+        
+        // Clear inputs and re-render UI
+        nameInput.value = "";
+        amountInput.value = "";
+        renderBills();
+      }
+    }
+
+    // Initial render on page load
+    renderBills();
+  </script>
+</body>
+</html>
