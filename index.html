@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Cash Flow Tracker</title>
+  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="manifest" href="manifest.json">
   <style>
     :root {
       --bg-color: #0b0f19;
@@ -15,166 +15,89 @@
       --card-inner: #0f172a;
       --text-main: #f8fafc;
       --text-sub: #94a3b8;
-      
-      /* Colors */
       --green-income: #22c55e;
       --green-glow: rgba(34, 197, 94, 0.15);
       --orange-bill: #f97316;
       --orange-glow: rgba(249, 115, 22, 0.15);
       --danger-red: #ef4444;
-      
-      /* New Baby Blue for Credit */
       --blue-credit: #38bdf8;
       --blue-glow: rgba(56, 189, 248, 0.15);
-      
       --border-color: #334155;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      padding: 1rem;
-      display: flex;
-      justify-content: center;
-    }
-
-    .app-container {
-      width: 100%;
-      max-width: 480px;
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-      padding-bottom: 2rem;
-    }
-
-    /* Cards */
-    .card {
-      background-color: var(--card-bg);
-      border-radius: 28px;
-      padding: 1.5rem;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-main); padding: 1rem; display: flex; justify-content: center; }
+    .app-container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 1.25rem; padding-bottom: 2rem; }
+    
+    .card { background-color: var(--card-bg); border-radius: 28px; padding: 1.5rem; border: 1px solid var(--border-color); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4); }
     h1 { font-size: 1.4rem; font-weight: 700; text-align: center; margin-bottom: 1.25rem; }
     h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-main); }
 
-    /* Inputs */
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-      margin-bottom: 1rem;
-    }
+    .input-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
     label { font-size: 0.85rem; color: var(--text-sub); margin-left: 0.5rem; }
-    input, select {
-      background-color: var(--card-inner);
-      border: 1.5px solid var(--border-color);
-      color: var(--text-main);
-      padding: 0.85rem 1.25rem;
-      border-radius: 9999px;
-      font-size: 1rem;
-      outline: none;
-      width: 100%;
-      transition: border-color 0.2s ease;
-    }
+    input, select { background-color: var(--card-inner); border: 1.5px solid var(--border-color); color: var(--text-main); padding: 0.85rem 1.25rem; border-radius: 9999px; font-size: 1rem; outline: none; width: 100%; transition: border-color 0.2s ease; }
     input:focus, select:focus { border-color: var(--green-income); }
     .credit-input:focus { border-color: var(--blue-credit) !important; }
 
-    /* Buttons */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border: none;
-      padding: 0.9rem 1.5rem;
-      border-radius: 9999px;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      width: 100%;
-      transition: transform 0.1s ease;
-    }
+    .btn { display: inline-flex; align-items: center; justify-content: center; border: none; padding: 0.9rem 1.5rem; border-radius: 9999px; font-size: 1rem; font-weight: 700; cursor: pointer; width: 100%; transition: transform 0.1s ease; }
     .btn:active { transform: scale(0.98); }
+    .btn-green { background-color: var(--green-income); color: #042f1a; box-shadow: 0 4px 14px var(--green-glow); }
     .btn-orange { background-color: var(--orange-bill); color: #3b1402; box-shadow: 0 4px 14px var(--orange-glow); }
     .btn-blue { background-color: var(--blue-credit); color: #082f49; box-shadow: 0 4px 14px var(--blue-glow); }
+    .btn-outline { background-color: transparent; color: var(--text-main); border: 1.5px solid var(--border-color); margin-top: 0.5rem; }
     
-    .btn-delete {
-      background-color: transparent;
-      color: var(--danger-red);
-      border: 1px solid var(--danger-red);
-      border-radius: 9999px;
-      padding: 0.3rem 0.7rem;
-      font-size: 0.75rem;
-      cursor: pointer;
-      margin-top: 0.4rem;
-    }
+    .action-btns { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
+    .btn-small { background-color: transparent; border-radius: 9999px; padding: 0.3rem 0.7rem; font-size: 0.75rem; cursor: pointer; }
+    .btn-edit { color: var(--text-main); border: 1px solid var(--text-sub); }
+    .btn-delete { color: var(--danger-red); border: 1px solid var(--danger-red); }
 
-    /* Text Colors */
     .income-text { color: var(--green-income); font-weight: 700; font-size: 1.1rem; }
     .bill-text { color: var(--orange-bill); font-weight: 700; font-size: 1.1rem; }
     .credit-text { color: var(--blue-credit); font-weight: 700; font-size: 1.1rem; }
 
-    /* Stat Rows */
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      border-radius: 18px;
-      background-color: var(--card-inner);
-      margin-bottom: 0.6rem;
-    }
-
-    .leftover-box {
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(15, 23, 42, 0.8));
-      border: 1.5px solid var(--green-income);
-      border-radius: 22px;
-      padding: 1.2rem;
-      text-align: center;
-      margin-top: 1rem;
-    }
+    .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-radius: 18px; background-color: var(--card-inner); margin-bottom: 0.6rem; }
+    
+    .leftover-box { background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(15, 23, 42, 0.8)); border: 1.5px solid var(--green-income); border-radius: 22px; padding: 1.2rem; text-align: center; margin-top: 1rem; }
     .leftover-box span { font-size: 0.9rem; color: var(--text-sub); }
     .leftover-box .amount { font-size: 1.7rem; font-weight: 800; margin-top: 0.25rem; }
 
-    /* Lists */
     .list-container { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
-    
-    .item-card {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: var(--card-inner);
-      border-radius: 16px;
-      padding: 0.9rem 1.1rem;
-    }
+    .item-card { display: flex; justify-content: space-between; align-items: center; background-color: var(--card-inner); border-radius: 16px; padding: 0.9rem 1.1rem; }
     .item-card.bill { border-left: 5px solid var(--orange-bill); }
     .item-card.credit { border-left: 5px solid var(--blue-credit); }
-    
     .item-info { display: flex; flex-direction: column; gap: 0.2rem; }
     .item-title { font-weight: 600; font-size: 1rem; color: var(--text-main); }
     .item-sub { font-size: 0.8rem; color: var(--text-sub); }
     .item-actions { display: flex; flex-direction: column; align-items: flex-end; }
+
+    /* Radial Chart CSS */
+    .chart-container { display: flex; justify-content: center; align-items: center; margin: 1.5rem 0; gap: 1.5rem; }
+    .radial-chart { width: 140px; height: 140px; border-radius: 50%; background: conic-gradient(var(--card-inner) 0% 100%); box-shadow: 0 0 15px rgba(0,0,0,0.5); transition: background 0.5s ease; }
+    .chart-legend { display: flex; flex-direction: column; gap: 0.5rem; }
+    .legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-sub); }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
   </style>
 </head>
 <body>
 
   <div class="app-container">
 
-    <!-- Monthly Cash Flow -->
     <div class="card">
       <h1>Monthly Cash Flow</h1>
-
+      
       <div class="input-group">
         <label>Total Monthly Income ($)</label>
         <input type="number" id="monthlyIncomeInput" step="50">
+      </div>
+
+      <!-- Radial Breakdown Chart -->
+      <div class="chart-container">
+        <div class="radial-chart" id="radialChart"></div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background: var(--green-income);"></div> Free Cash</div>
+          <div class="legend-item"><div class="legend-dot" style="background: var(--orange-bill);"></div> Fixed Bills</div>
+          <div class="legend-item"><div class="legend-dot" style="background: var(--blue-credit);"></div> Credit Debt</div>
+        </div>
       </div>
 
       <div class="stat-row">
@@ -209,93 +132,68 @@
       </div>
     </div>
 
-    <!-- Add Credit Card Form -->
-    <div class="card" style="border-color: var(--blue-glow);">
-      <h2 style="color: var(--blue-credit);">Add Credit Card</h2>
-      
-      <div class="input-group">
-        <label>Card Name (e.g. Best Buy)</label>
-        <input type="text" id="creditNameInput" class="credit-input">
-      </div>
-      <div class="input-group">
-        <label>Total Current Balance ($)</label>
-        <input type="number" id="creditBalanceInput" class="credit-input" step="0.01">
-      </div>
-      <div class="input-group">
-        <label>Monthly Payment ($)</label>
-        <input type="number" id="creditPaymentInput" class="credit-input" step="0.01">
-      </div>
-      <div class="input-group">
-        <label>Payment Due Date</label>
-        <select id="creditDaySelect" class="credit-input"></select>
-      </div>
-
-      <button class="btn btn-blue" onclick="addCredit()">+ Add Credit Card</button>
+    <!-- Add/Edit Credit Card Form -->
+    <div class="card" style="border-color: var(--blue-glow);" id="creditFormCard">
+      <h2 style="color: var(--blue-credit);" id="creditFormTitle">Add Credit Card</h2>
+      <div class="input-group"><label>Card Name</label><input type="text" id="creditNameInput" class="credit-input"></div>
+      <div class="input-group"><label>Total Current Balance ($)</label><input type="number" id="creditBalanceInput" class="credit-input" step="0.01"></div>
+      <div class="input-group"><label>Monthly Payment ($)</label><input type="number" id="creditPaymentInput" class="credit-input" step="0.01"></div>
+      <div class="input-group"><label>Payment Due Date</label><select id="creditDaySelect" class="credit-input"></select></div>
+      <button class="btn btn-blue" id="creditSubmitBtn" onclick="submitCredit()">+ Add Credit Card</button>
     </div>
 
-    <!-- Active Credit Cards List -->
     <div class="card">
       <h2 style="color: var(--blue-credit);">Active Credit Cards</h2>
       <div class="list-container" id="creditListContainer"></div>
     </div>
 
-    <!-- Add Bill Form -->
-    <div class="card" style="border-color: var(--orange-glow);">
-      <h2 style="color: var(--orange-bill);">Add Recurring Bill</h2>
-      
-      <div class="input-group">
-        <label>Bill Name</label>
-        <input type="text" id="billNameInput">
-      </div>
-      <div class="input-group">
-        <label>Amount ($)</label>
-        <input type="number" id="billAmountInput" step="0.01">
-      </div>
-      <div class="input-group">
-        <label>Recurring Day</label>
-        <select id="billDaySelect"></select>
-      </div>
-
-      <button class="btn btn-orange" onclick="addBill()">+ Add Recurring Bill</button>
+    <!-- Add/Edit Bill Form -->
+    <div class="card" style="border-color: var(--orange-glow);" id="billFormCard">
+      <h2 style="color: var(--orange-bill);" id="billFormTitle">Add Recurring Bill</h2>
+      <div class="input-group"><label>Bill Name</label><input type="text" id="billNameInput"></div>
+      <div class="input-group"><label>Amount ($)</label><input type="number" id="billAmountInput" step="0.01"></div>
+      <div class="input-group"><label>Recurring Day</label><select id="billDaySelect"></select></div>
+      <button class="btn btn-orange" id="billSubmitBtn" onclick="submitBill()">+ Add Recurring Bill</button>
     </div>
 
-    <!-- Active Bills List -->
     <div class="card">
       <h2 style="color: var(--orange-bill);">Active Bills</h2>
       <div class="list-container" id="billsListContainer"></div>
     </div>
 
+    <!-- Settings & Backup -->
+    <div class="card">
+      <h2>Settings & Backup</h2>
+      <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 1rem;">Export your data to a secure file on your device before switching phones or clearing your cache.</p>
+      <button class="btn btn-green" onclick="exportData()">Export Data Backup</button>
+      
+      <label for="importFile" class="btn btn-outline" style="display: block; text-align: center; cursor: pointer;">Import Data Backup</label>
+      <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+    </div>
+
   </div>
 
   <script>
-    // Populate Dropdowns
+    // Initialize Dropdowns
     const billDaySelect = document.getElementById("billDaySelect");
     const creditDaySelect = document.getElementById("creditDaySelect");
     for (let day = 1; day <= 31; day++) {
-      const suffix = (day === 1 || day === 21 || day === 31) ? "st" :
-                     (day === 2 || day === 22) ? "nd" :
-                     (day === 3 || day === 23) ? "rd" : "th";
+      const suffix = (day === 1 || day === 21 || day === 31) ? "st" : (day === 2 || day === 22) ? "nd" : (day === 3 || day === 23) ? "rd" : "th";
       const optionText = `${day}${suffix} of every month`;
-      
-      const opt1 = document.createElement("option"); opt1.value = day; opt1.textContent = optionText;
-      const opt2 = document.createElement("option"); opt2.value = day; opt2.textContent = optionText;
-      
-      billDaySelect.appendChild(opt1);
-      creditDaySelect.appendChild(opt2);
+      billDaySelect.appendChild(new Option(optionText, day));
+      creditDaySelect.appendChild(new Option(optionText, day));
     }
 
     // Load Data
     let bills = JSON.parse(localStorage.getItem("user_bills")) || [];
     let creditCards = JSON.parse(localStorage.getItem("user_credit")) || [];
     let storedIncome = localStorage.getItem("user_income") || "4000";
+    let editingBillId = null;
+    let editingCreditId = null;
 
     const incomeInput = document.getElementById("monthlyIncomeInput");
     incomeInput.value = storedIncome;
-
-    incomeInput.addEventListener("input", () => {
-      localStorage.setItem("user_income", incomeInput.value);
-      updateCalculations();
-    });
+    incomeInput.addEventListener("input", () => { localStorage.setItem("user_income", incomeInput.value); updateCalculations(); });
 
     function saveAndRender() {
       localStorage.setItem("user_bills", JSON.stringify(bills));
@@ -304,28 +202,59 @@
       updateCalculations();
     }
 
-    // Add Functions
-    function addBill() {
+    // Bill Logic
+    function submitBill() {
       const name = document.getElementById("billNameInput").value.trim();
       const amount = parseFloat(document.getElementById("billAmountInput").value);
       const day = parseInt(document.getElementById("billDaySelect").value, 10);
 
-      if (name && amount > 0) {
-        bills.push({ id: Date.now().toString(), name, amount, day });
+      if (name && amount >= 0) {
+        if (editingBillId) {
+          const index = bills.findIndex(b => b.id === editingBillId);
+          if (index !== -1) bills[index] = { id: editingBillId, name, amount, day };
+          editingBillId = null;
+          document.getElementById("billFormTitle").textContent = "Add Recurring Bill";
+          document.getElementById("billSubmitBtn").textContent = "+ Add Recurring Bill";
+        } else {
+          bills.push({ id: Date.now().toString(), name, amount, day });
+        }
         document.getElementById("billNameInput").value = "";
         document.getElementById("billAmountInput").value = "";
         saveAndRender();
       }
     }
 
-    function addCredit() {
+    function editBill(id) {
+      const bill = bills.find(b => b.id === id);
+      if (bill) {
+        document.getElementById("billNameInput").value = bill.name;
+        document.getElementById("billAmountInput").value = bill.amount;
+        document.getElementById("billDaySelect").value = bill.day;
+        editingBillId = id;
+        document.getElementById("billFormTitle").textContent = "Edit Bill";
+        document.getElementById("billSubmitBtn").textContent = "Save Changes";
+        document.getElementById("billFormCard").scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+    function deleteBill(id) { bills = bills.filter(b => b.id !== id); saveAndRender(); }
+
+    // Credit Logic
+    function submitCredit() {
       const name = document.getElementById("creditNameInput").value.trim();
       const balance = parseFloat(document.getElementById("creditBalanceInput").value);
       const payment = parseFloat(document.getElementById("creditPaymentInput").value);
       const day = parseInt(document.getElementById("creditDaySelect").value, 10);
 
       if (name && balance >= 0 && payment >= 0) {
-        creditCards.push({ id: Date.now().toString(), name, balance, payment, day });
+        if (editingCreditId) {
+          const index = creditCards.findIndex(c => c.id === editingCreditId);
+          if (index !== -1) creditCards[index] = { id: editingCreditId, name, balance, payment, day };
+          editingCreditId = null;
+          document.getElementById("creditFormTitle").textContent = "Add Credit Card";
+          document.getElementById("creditSubmitBtn").textContent = "+ Add Credit Card";
+        } else {
+          creditCards.push({ id: Date.now().toString(), name, balance, payment, day });
+        }
         document.getElementById("creditNameInput").value = "";
         document.getElementById("creditBalanceInput").value = "";
         document.getElementById("creditPaymentInput").value = "";
@@ -333,59 +262,95 @@
       }
     }
 
-    // Delete Functions
-    function deleteBill(id) { bills = bills.filter(b => b.id !== id); saveAndRender(); }
+    function editCredit(id) {
+      const card = creditCards.find(c => c.id === id);
+      if (card) {
+        document.getElementById("creditNameInput").value = card.name;
+        document.getElementById("creditBalanceInput").value = card.balance;
+        document.getElementById("creditPaymentInput").value = card.payment;
+        document.getElementById("creditDaySelect").value = card.day;
+        editingCreditId = id;
+        document.getElementById("creditFormTitle").textContent = "Edit Credit Card";
+        document.getElementById("creditSubmitBtn").textContent = "Save Changes";
+        document.getElementById("creditFormCard").scrollIntoView({ behavior: 'smooth' });
+      }
+    }
     function deleteCredit(id) { creditCards = creditCards.filter(c => c.id !== id); saveAndRender(); }
 
-    // Render Lists
+    // Backup & Restore Logic
+    function exportData() {
+      const data = { income: incomeInput.value, bills, creditCards };
+      const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "finance_backup.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data.income) incomeInput.value = data.income;
+          if (data.bills) bills = data.bills;
+          if (data.creditCards) creditCards = data.creditCards;
+          saveAndRender();
+          alert("Backup successfully restored!");
+        } catch (err) {
+          alert("Error reading backup file.");
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = ""; // Reset file input
+    }
+
+    // UI Updates
     function renderLists() {
       const bContainer = document.getElementById("billsListContainer");
       const cContainer = document.getElementById("creditListContainer");
-      bContainer.innerHTML = "";
-      cContainer.innerHTML = "";
+      bContainer.innerHTML = ""; cContainer.innerHTML = "";
 
-      const sortedBills = [...bills].sort((a, b) => a.day - b.day);
-      sortedBills.forEach(bill => {
+      [...bills].sort((a, b) => a.day - b.day).forEach(bill => {
         bContainer.innerHTML += `
           <div class="item-card bill">
-            <div class="item-info">
-              <span class="item-title">${bill.name}</span>
-              <span class="item-sub">Due on the ${bill.day}</span>
-            </div>
+            <div class="item-info"><span class="item-title">${bill.name}</span><span class="item-sub">Due on the ${bill.day}</span></div>
             <div class="item-actions">
               <span class="bill-text">$${bill.amount.toFixed(2)}</span>
-              <button class="btn-delete" onclick="deleteBill('${bill.id}')">Delete</button>
+              <div class="action-btns">
+                <button class="btn-small btn-edit" onclick="editBill('${bill.id}')">Edit</button>
+                <button class="btn-small btn-delete" onclick="deleteBill('${bill.id}')">Del</button>
+              </div>
             </div>
           </div>`;
       });
 
-      const sortedCredit = [...creditCards].sort((a, b) => a.day - b.day);
-      sortedCredit.forEach(card => {
+      [...creditCards].sort((a, b) => a.day - b.day).forEach(card => {
         cContainer.innerHTML += `
           <div class="item-card credit">
-            <div class="item-info">
-              <span class="item-title">${card.name}</span>
-              <span class="item-sub">Balance: $${card.balance.toFixed(2)}</span>
-              <span class="item-sub">Due on the ${card.day}</span>
-            </div>
+            <div class="item-info"><span class="item-title">${card.name}</span><span class="item-sub">Bal: $${card.balance.toFixed(2)} | Due: ${card.day}</span></div>
             <div class="item-actions">
               <span class="credit-text">-$${card.payment.toFixed(2)}/mo</span>
-              <button class="btn-delete" onclick="deleteCredit('${card.id}')">Delete</button>
+              <div class="action-btns">
+                <button class="btn-small btn-edit" onclick="editCredit('${card.id}')">Edit</button>
+                <button class="btn-small btn-delete" onclick="deleteCredit('${card.id}')">Del</button>
+              </div>
             </div>
           </div>`;
       });
     }
 
-    // Calculations
     function updateCalculations() {
       const income = parseFloat(incomeInput.value) || 0;
       const totalBills = bills.reduce((sum, item) => sum + item.amount, 0);
       const totalCreditPayments = creditCards.reduce((sum, item) => sum + item.payment, 0);
       const totalDebt = creditCards.reduce((sum, item) => sum + item.balance, 0);
-      
       const leftover = income - (totalBills + totalCreditPayments);
-      const yearlyLeftover = leftover * 12;
-
+      
       document.getElementById("displayIncome").textContent = `$${income.toFixed(2)}`;
       document.getElementById("displayBills").textContent = `$${totalBills.toFixed(2)}`;
       document.getElementById("displayCreditPayments").textContent = `$${totalCreditPayments.toFixed(2)}`;
@@ -395,19 +360,42 @@
       leftoverEl.textContent = `$${leftover.toFixed(2)}`;
       leftoverEl.style.color = leftover >= 0 ? "var(--green-income)" : "var(--danger-red)";
       leftoverEl.parentElement.style.borderColor = leftover >= 0 ? "var(--green-income)" : "var(--danger-red)";
+      
+      const yearlyEl = document.getElementById("displayYearlyLeftover");
+      yearlyEl.textContent = `$${(leftover * 12).toFixed(2)}`;
+      yearlyEl.style.color = leftover >= 0 ? "var(--green-income)" : "var(--danger-red)";
 
-      document.getElementById("displayYearlyLeftover").textContent = `$${yearlyLeftover.toFixed(2)}`;
-      document.getElementById("displayYearlyLeftover").style.color = yearlyLeftover >= 0 ? "var(--green-income)" : "var(--danger-red)";
+      // Update Radial Chart
+      let billPct = 0, creditPct = 0, freePct = 0;
+      if (income > 0) {
+        billPct = Math.min((totalBills / income) * 100, 100);
+        creditPct = Math.min((totalCreditPayments / income) * 100, 100 - billPct);
+        freePct = Math.max(100 - billPct - creditPct, 0);
+      }
+      
+      const chart = document.getElementById("radialChart");
+      if (income <= 0 || (totalBills === 0 && totalCreditPayments === 0)) {
+        chart.style.background = `conic-gradient(var(--green-income) 0% 100%)`;
+      } else if (leftover < 0) {
+        // Over budget - show red overlapping
+        chart.style.background = `conic-gradient(var(--danger-red) 0% 100%)`;
+      } else {
+        const p1 = billPct;
+        const p2 = billPct + creditPct;
+        chart.style.background = `conic-gradient(
+          var(--orange-bill) 0% ${p1}%, 
+          var(--blue-credit) ${p1}% ${p2}%, 
+          var(--green-income) ${p2}% 100%
+        )`;
+      }
     }
 
-    // Initial Load
+    // Init
     renderLists();
     updateCalculations();
   </script>
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js');
-    }
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
   </script>
 </body>
 </html>
